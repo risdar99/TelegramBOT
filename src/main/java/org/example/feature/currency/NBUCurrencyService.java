@@ -3,17 +3,18 @@ package org.example.feature.currency;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.example.feature.currency.dto.Currency;
-import org.example.feature.currency.dto.CurrencyItemMono;
+import org.example.feature.currency.dto.CurrencyItemNBU;
 import org.jsoup.Jsoup;
 
 import java.io.IOException;
 import java.util.List;
 import java.lang.reflect.Type;
 
-public class MonoBankCurrencyService implements CurrencyService{
+public class NBUCurrencyService implements CurrencyService{
+
     @Override
-    public double getRate(Currency currency){
-        String url ="https://api.monobank.ua/bank/currency";
+    public double getRate(Currency currency) {
+        String url ="https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json";
         String json;
         try {
             json = Jsoup
@@ -24,29 +25,28 @@ public class MonoBankCurrencyService implements CurrencyService{
                     .text();
         } catch (IOException e) {
             e.printStackTrace();
-            throw new IllegalStateException("Can`t connect to Mono API");
+            throw new IllegalStateException("Can`t connect to NBU API");
         }
 
         Type typeToken = TypeToken
-                .getParameterized(List.class, CurrencyItemMono.class)
+                .getParameterized(List.class, CurrencyItemNBU.class)
                 .getType();
-        List<CurrencyItemMono> currencyItems = new Gson().fromJson(json,typeToken);
+        List<CurrencyItemNBU> currencyItemsNBU = new Gson().fromJson(json,typeToken);
 
-        int currencyCode;
+        int r030;
         if(currency == Currency.USD) {
-            currencyCode = 840;
+            r030 = 840;
         } else if(currency == Currency.EUR) {
-            currencyCode = 978;
+            r030 = 978;
         } else {
-            currencyCode = 0;
+            r030 = 0;
         }
 
-        return currencyItems.stream()
-                .filter(it -> it.getCurrencyCodeA() == (currencyCode))
-                .filter(it -> it.getCurrencyCodeB() == 980)
-                .map(CurrencyItemMono::getRateBuy)
+        return currencyItemsNBU.stream()
+                .filter(it -> it.getR030() == (r030))
+                //.filter(it -> it.getBase_cc() == Currency.UAH)
+                .map(CurrencyItemNBU::getRate)
                 .findFirst()
                 .orElseThrow();
-
     }
 }

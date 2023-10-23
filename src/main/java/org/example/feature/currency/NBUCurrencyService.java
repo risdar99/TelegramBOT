@@ -44,7 +44,6 @@ public class NBUCurrencyService implements CurrencyService{
 
         return currencyItemsNBU.stream()
                 .filter(it -> it.getR030() == (r030))
-                //.filter(it -> it.getBase_cc() == Currency.UAH)
                 .map(CurrencyItemNBU::getRate)
                 .findFirst()
                 .orElseThrow();

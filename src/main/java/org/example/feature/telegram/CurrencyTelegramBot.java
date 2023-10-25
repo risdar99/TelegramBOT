@@ -1,15 +1,19 @@
 package org.example.feature.telegram;
 
-import org.example.feature.telegram.BotConstants;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+
+import org.example.feature.command.StartCommand;
+import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import java.util.List;
+public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
 
-public class CurrencyTelegramBot extends TelegramLongPollingBot {
+    public CurrencyTelegramBot(){
+        register(new StartCommand());
+    }
     @Override
-    public void onUpdateReceived(Update update) {
-        System.out.println("Update received");
+    public void processNonCommandUpdate(Update update) {
+        System.out.println("Non-command here!");
+
     }
 
     @Override
@@ -21,5 +25,6 @@ public class CurrencyTelegramBot extends TelegramLongPollingBot {
     public String getBotUsername() {
         return BotConstants.BOT_NAME;
     }
-  
+
+
 }

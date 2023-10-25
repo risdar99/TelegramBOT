@@ -28,19 +28,19 @@ public class StartCommand extends BotCommand {
         message.setText(startText);
         message.setChatId(Long.toString(chat.getId()));
 
-        // Створіть кнопку "Отримати інфо"
+       
         InlineKeyboardButton.InlineKeyboardButtonBuilder infoButton = InlineKeyboardButton
                 .builder()
                 .text("Отримати інфо")
                 .callbackData("Отримати інфо");
 
-        // Створіть кнопку "Налаштування"
+       
         InlineKeyboardButton.InlineKeyboardButtonBuilder settingsButton = InlineKeyboardButton
                 .builder()
                 .text("Налаштування")
                 .callbackData("Налаштування");
 
-        // Створіть клавіатуру з обома кнопками
+      
         InlineKeyboardMarkup keyboard = InlineKeyboardMarkup
                 .builder()
                 .keyboard(Collections.singletonList(

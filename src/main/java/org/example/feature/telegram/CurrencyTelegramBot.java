@@ -2,22 +2,28 @@ package org.example.feature.telegram;
 
 
 import org.example.feature.command.StartCommand;
+import org.example.feature.currency.dto.Bank;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.example.feature.currency.dto.Currency;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Currency;
 import java.util.List;
 
 public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
 
-    public List<Currency> currencies;
+    private List<Currency> currencies;
+    private Bank bank;
     public CurrencyTelegramBot(){
+        currencies = new ArrayList<>();
+        currencies.add(Currency.USD);
+        currencies.add(Currency.EUR);
+        bank = Bank.NBU;
         register(new StartCommand());
     }
     @Override
@@ -32,10 +38,25 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
             if(update.getCallbackQuery().getData().equals("Валюти")) {
                 createCurrencyButton(update);
             }
+            if(update.getCallbackQuery().getData().equals("USD") || update.getCallbackQuery().getData().equals("✓USD")) {
+                makeUsdAsCurrency(update);
+            }
+            if(update.getCallbackQuery().getData().equals("EUR") || update.getCallbackQuery().getData().equals("✓EUR")) {
+                makeEurAsCurrency(update);
+            }
+            if(update.getCallbackQuery().getData().equals("НБУ")) {
+                makeNbuAsBank(update);
+            }
+            if(update.getCallbackQuery().getData().equals("ПриватБанк")) {
+                makePrivatAsBank(update);
+            }
+            if(update.getCallbackQuery().getData().equals("МоноБанк")) {
+                makeMonoAsBank(update);
+            }
         }
     }
 
-    private void createSettingsButton(Update update) {
+    private void createSettingsButton(Update update)  {
         String startText = "Налаштування";
 
         SendMessage message = new SendMessage();
@@ -68,24 +89,35 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
     private void createBankButton(Update update) {
         String startText = "Оберіть банк з якого ви хочете отримувати актуальний курс валют:";
 
+        String nbu = "НБУ";
+        String privat = "ПриватБанк";
+        String mono = "МоноБанк";
+        if(bank.equals(Bank.NBU)) {
+            nbu = "✓НБУ";
+        } else if(bank.equals(Bank.PRIVAT)) {
+            privat = "✓ПриватБанк";
+        } else if(bank.equals(Bank.MONO)) {
+            mono = "✓МоноБанк";
+        }
+
         SendMessage message = new SendMessage();
         message.setText(startText);
         message.setChatId(update.getCallbackQuery().getFrom().getId());
 
         InlineKeyboardButton.InlineKeyboardButtonBuilder nbuButton = InlineKeyboardButton
                 .builder()
-                .text("НБУ")
-                .callbackData("НБУ");
+                .text(nbu)
+                .callbackData(nbu);
 
         InlineKeyboardButton.InlineKeyboardButtonBuilder privatButton = InlineKeyboardButton
                 .builder()
-                .text("ПриватБанк")
-                .callbackData("ПриватБанк");
+                .text(privat)
+                .callbackData(privat);
 
         InlineKeyboardButton.InlineKeyboardButtonBuilder monoButton = InlineKeyboardButton
                 .builder()
-                .text("МоноБанк")
-                .callbackData("Монобанк");
+                .text(mono)
+                .callbackData(mono);
 
 
         InlineKeyboardMarkup keyboard = InlineKeyboardMarkup
@@ -103,19 +135,28 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
     private void createCurrencyButton(Update update) {
         String startText = "Оберіть валюти, курс яких ви хочете отримувати:";
 
+        String usd = "USD";
+        String eur = "EUR";
+        if(currencies.contains(Currency.USD)) {
+            usd = "✓USD";
+        }
+        if(currencies.contains(Currency.EUR)) {
+            eur = "✓EUR";
+        }
+
         SendMessage message = new SendMessage();
         message.setText(startText);
         message.setChatId(update.getCallbackQuery().getFrom().getId());
 
         InlineKeyboardButton.InlineKeyboardButtonBuilder usdButton = InlineKeyboardButton
                 .builder()
-                .text("✓USD")
-                .callbackData("USD");
+                .text(usd)
+                .callbackData(usd);
 
         InlineKeyboardButton.InlineKeyboardButtonBuilder eurButton = InlineKeyboardButton
                 .builder()
-                .text("EUR")
-                .callbackData("EUR");
+                .text(eur)
+                .callbackData(eur);
 
 
         InlineKeyboardMarkup keyboard = InlineKeyboardMarkup
@@ -129,6 +170,43 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
 
         sendApiMethodAsync(message);
     }
+
+    private void makeUsdAsCurrency(Update update) {
+        if(update.getCallbackQuery().getData().equals("USD")) {
+            currencies.add(Currency.USD);
+        }
+        if(update.getCallbackQuery().getData().equals("✓USD")) {
+            currencies.remove(Currency.USD);
+        }
+        createCurrencyButton(update);
+    }
+
+    private void makeEurAsCurrency(Update update) {
+        if(update.getCallbackQuery().getData().equals("EUR")) {
+            currencies.add(Currency.EUR);
+        }
+        if(update.getCallbackQuery().getData().equals("✓EUR")) {
+            currencies.remove(Currency.EUR);
+        }
+        createCurrencyButton(update);
+    }
+
+    private void makeNbuAsBank(Update update) {
+        bank = Bank.NBU;
+        createBankButton(update);
+    }
+
+    private void makePrivatAsBank(Update update) {
+        bank = Bank.PRIVAT;
+        createBankButton(update);
+    }
+
+    private void makeMonoAsBank(Update update) {
+        bank = Bank.MONO;
+        createBankButton(update);
+    }
+
+
 
     @Override
     public String  getBotToken() {

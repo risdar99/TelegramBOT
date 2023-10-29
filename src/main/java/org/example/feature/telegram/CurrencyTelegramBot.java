@@ -145,8 +145,9 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
 
         InlineKeyboardMarkup keyboard = InlineKeyboardMarkup
                 .builder()
-                .keyboard(Collections.singletonList(
-                        Arrays.asList(banksButton.build(), currencyButton.build())
+                .keyboard(Arrays.asList(
+                        Arrays.asList(banksButton.build(), currencyButton.build()),
+                        Arrays.asList(roundingButton.build(), notificationButton.build())
                 ))
                 .build();
 

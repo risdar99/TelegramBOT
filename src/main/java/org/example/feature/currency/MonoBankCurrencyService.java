@@ -13,10 +13,35 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 public class MonoBankCurrencyService implements CurrencyService{
+    String json;
+    List<CurrencyItemMono> currencyItems;
+    String url ="https://api.monobank.ua/bank/currency";
     @Override
     public double getRate(Currency currency){
-        String url ="https://api.monobank.ua/bank/currency";
-        String json;
+        // TODO: 30.10.2023 можна розбити на під методи
+        getJson(url);
+        int currencyCode = getCurrencyCode(currency);
+
+        return currencyItems.stream()
+                .filter(it -> it.getCurrencyCodeA() == (currencyCode))
+                .filter(it -> it.getCurrencyCodeB() == 980)
+                .map(CurrencyItemMono::getRateBuy)
+                .findFirst()
+                .orElseThrow();
+
+    }
+
+    public int getCurrencyCode(Currency currency) {
+        if(currency == Currency.USD) {
+            return 840;
+        } else if(currency == Currency.EUR) {
+            return 978;
+        } else {
+            return 0;
+        }
+    }
+
+    public void getJson(String url){
         try {
             json = Jsoup
                     .connect(url)
@@ -28,27 +53,9 @@ public class MonoBankCurrencyService implements CurrencyService{
             e.printStackTrace();
             throw new IllegalStateException("Can`t connect to Mono API");
         }
-
         Type typeToken = TypeToken
                 .getParameterized(List.class, CurrencyItemMono.class)
                 .getType();
-        List<CurrencyItemMono> currencyItems = new Gson().fromJson(json,typeToken);
-
-        int currencyCode;
-        if(currency == Currency.USD) {
-            currencyCode = 840;
-        } else if(currency == Currency.EUR) {
-            currencyCode = 978;
-        } else {
-            currencyCode = 0;
-        }
-
-        return currencyItems.stream()
-                .filter(it -> it.getCurrencyCodeA() == (currencyCode))
-                .filter(it -> it.getCurrencyCodeB() == 980)
-                .map(CurrencyItemMono::getRateBuy)
-                .findFirst()
-                .orElseThrow();
-
+        currencyItems = new Gson().fromJson(json,typeToken);
     }
 }

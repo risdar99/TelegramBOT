@@ -19,9 +19,9 @@ public class StartCommand extends BotCommand {
         super("start", "Start command");
     }
 
+
     @Override
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
-
         String startText = "Ласкаво просимо! Цей бот допоможе відслідковувати актуальні курси валют";
 
         SendMessage message = new SendMessage();
@@ -29,18 +29,27 @@ public class StartCommand extends BotCommand {
         message.setChatId(Long.toString(chat.getId()));
 
 
-        // TODO: 30.10.2023 можна винести в окремий метод, так як метод і так великий. також цей код дублюється в іншому класі
+        InlineKeyboardMarkup keyboard = createKeyboard();
+        message.setReplyMarkup(keyboard);
+
+        try {
+            absSender.execute(message);
+        } catch (TelegramApiException e) {
+            System.err.println("Помилка " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public InlineKeyboardMarkup createKeyboard() {
         InlineKeyboardButton.InlineKeyboardButtonBuilder infoButton = InlineKeyboardButton
                 .builder()
                 .text("Отримати інфо")
                 .callbackData("Отримати інфо");
 
-
         InlineKeyboardButton.InlineKeyboardButtonBuilder settingsButton = InlineKeyboardButton
                 .builder()
                 .text("Налаштування")
                 .callbackData("Налаштування");
-
 
         InlineKeyboardMarkup keyboard = InlineKeyboardMarkup
                 .builder()
@@ -49,13 +58,6 @@ public class StartCommand extends BotCommand {
                 ))
                 .build();
 
-        message.setReplyMarkup(keyboard);
-
-        try {
-            absSender.execute(message);
-        } catch (TelegramApiException e) {
-            // TODO: 30.10.2023 виберіть кращу помилку і текст до неї
-            throw new RuntimeException(e);
-        }
+        return keyboard;
     }
 }

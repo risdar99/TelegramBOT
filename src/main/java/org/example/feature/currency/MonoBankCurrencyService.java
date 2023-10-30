@@ -18,7 +18,7 @@ public class MonoBankCurrencyService implements CurrencyService{
     String url ="https://api.monobank.ua/bank/currency";
     @Override
     public double getRate(Currency currency){
-        // TODO: 30.10.2023 можна розбити на під методи
+
         getJson(url);
         int currencyCode = getCurrencyCode(currency);
 

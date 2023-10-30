@@ -19,7 +19,7 @@ public class NBUCurrencyService implements CurrencyService{
     String url ="https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json";
     @Override
     public double getRate(Currency currency) {
-        // TODO: 30.10.2023 можна розбити на під методи
+
         getJson(url);
         int r030 = getCurrencyCode(currency);
 

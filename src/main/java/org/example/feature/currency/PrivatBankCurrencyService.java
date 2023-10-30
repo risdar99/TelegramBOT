@@ -18,7 +18,7 @@ public class PrivatBankCurrencyService implements CurrencyService{
     String url ="https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5";
     @Override
     public double getRate(Currency currency) {
-        // TODO: 30.10.2023 можна розбити на під методи
+
         getJson(url);
 
         return currencyItems.stream()

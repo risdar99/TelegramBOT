@@ -1,10 +1,5 @@
 package org.example.feature.telegram;
 
-
-
-
-
-
 import org.example.feature.command.StartCommand;
 import org.example.feature.currency.CurrencyService;
 import org.example.feature.currency.NBUCurrencyService;
@@ -25,59 +20,82 @@ import java.util.Collections;
 import java.util.List;
 
 public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
-    private float roundedRate;
-    private float twoCharRate;
-    private float threeCharRate;
-    private float fourCharRate;
-    private List<Currency> currencies;
+    private final List<Currency> currencies;
     private Bank bank;
-    public CurrencyTelegramBot(){
+
+    public CurrencyTelegramBot() {
         currencies = new ArrayList<>();
         currencies.add(Currency.USD);
         currencies.add(Currency.EUR);
         bank = Bank.NBU;
         register(new StartCommand());
     }
+
     @Override
     public void processNonCommandUpdate(Update update) {
+        // TODO: 30.10.2023 можна розбити на під методи
 
-        if(update.hasCallbackQuery()){
-            if (update.getCallbackQuery().getData().equals("Отримати інфо")){
-                createGetInfoButton(update);
-            }
-            if(update.getCallbackQuery().getData().equals("Налаштування")){
-                createSettingsButton(update);
-            }
-            if(update.getCallbackQuery().getData().equals("Кількість знаків після коми")) {
-                roundingButton(update);
-            }
-            if(update.getCallbackQuery().getData().equals("Час оповіщень")) {
-                notificationButton(update);
-            }
-
-            if(update.getCallbackQuery().getData().equals("Банк")) {
-                createBankButton(update);
-            }
-            if(update.getCallbackQuery().getData().equals("Валюти")) {
-                createCurrencyButton(update);
-            }
-            if(update.getCallbackQuery().getData().equals("USD") || update.getCallbackQuery().getData().equals("✓USD")) {
-                makeUsdAsCurrency(update);
-            }
-            if(update.getCallbackQuery().getData().equals("EUR") || update.getCallbackQuery().getData().equals("✓EUR")) {
-                makeEurAsCurrency(update);
-            }
-            if(update.getCallbackQuery().getData().equals("НБУ")) {
-                makeNbuAsBank(update);
-            }
-            if(update.getCallbackQuery().getData().equals("ПриватБанк")) {
-                makePrivatAsBank(update);
-            }
-            if(update.getCallbackQuery().getData().equals("МоноБанк")) {
-                makeMonoAsBank(update);
-            }
+        if (update.hasCallbackQuery()) {
+            checkCallbackOfMainMenu(update);
+            checkCallbackOfSettingsMenu(update);
+            checkCallbackOfCurrencyMenu(update);
+            checkCallbackOfBanksMenu(update);
         }
     }
+
+    private void checkCallbackOfMainMenu(Update update) {
+        if (update.getCallbackQuery().getData().equals("Отримати інфо")) {
+            createGetInfoButton(update);
+        }
+        if (update.getCallbackQuery().getData().equals("Налаштування")) {
+            createSettingsButton(update);
+        }
+    }
+
+    private void checkCallbackOfSettingsMenu(Update update) {
+        if (update.getCallbackQuery().getData().equals("Кількість знаків після коми")) {
+            roundingButton(update);
+        }
+        if (update.getCallbackQuery().getData().equals("Час оповіщень")) {
+            notificationButton(update);
+        }
+
+        if (update.getCallbackQuery().getData().equals("Банк")) {
+            createBankButton(update);
+        }
+        if (update.getCallbackQuery().getData().equals("Валюти")) {
+            createCurrencyButton(update);
+        }
+    }
+
+    private void checkCallbackOfCurrencyMenu(Update update) {
+        if (update.getCallbackQuery().getData().equals("USD") || update.getCallbackQuery().getData().equals("✓USD")) {
+            makeUsdAsCurrency(update);
+        }
+        if (update.getCallbackQuery().getData().equals("EUR") || update.getCallbackQuery().getData().equals("✓EUR")) {
+            makeEurAsCurrency(update);
+        }
+    }
+
+    private void checkCallbackOfBanksMenu(Update update) {
+        if (update.getCallbackQuery().getData().equals("НБУ")) {
+            makeNbuAsBank(update);
+        }
+        if (update.getCallbackQuery().getData().equals("ПриватБанк")) {
+            makePrivatAsBank(update);
+        }
+        if (update.getCallbackQuery().getData().equals("МоноБанк")) {
+            makeMonoAsBank(update);
+        }
+    }
+
+    private SendMessage createSendMessage(String startText, Update update) {
+        SendMessage message = new SendMessage();
+        message.setText(startText);
+        message.setChatId(update.getCallbackQuery().getFrom().getId());
+        return message;
+    }
+
     private float getUSDFromNBU() {
         CurrencyService currencyService = new NBUCurrencyService();
         double rate = currencyService.getRate(Currency.USD);
@@ -85,13 +103,13 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
         return (float) rate;
     }
 
-    private void createGetInfoButton(Update update)  {
+    private void createGetInfoButton(Update update) {
         float usdRate = getUSDFromNBU();
         String startText = "Актуальний курс USD від Національного банку: " + String.format("%.2f", usdRate);
 
-        SendMessage message = new SendMessage();
-        message.setText(startText);
-        message.setChatId(update.getCallbackQuery().getFrom().getId());
+        SendMessage message = createSendMessage(startText, update);
+
+        // TODO: 30.10.2023 дублюєтьсяк код
 
         InlineKeyboardButton.InlineKeyboardButtonBuilder infoButton = InlineKeyboardButton
                 .builder()
@@ -115,12 +133,10 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
         sendApiMethodAsync(message);
     }
 
-    private void createSettingsButton(Update update)  {
+    private void createSettingsButton(Update update) {
         String startText = "Налаштування";
 
-        SendMessage message = new SendMessage();
-        message.setText(startText);
-        message.setChatId(update.getCallbackQuery().getFrom().getId());
+        SendMessage message = createSendMessage(startText, update);
 
         InlineKeyboardButton.InlineKeyboardButtonBuilder roundingButton = InlineKeyboardButton
                 .builder()
@@ -162,17 +178,16 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
         String nbu = "НБУ";
         String privat = "ПриватБанк";
         String mono = "МоноБанк";
-        if(bank.equals(Bank.NBU)) {
+        if (bank.equals(Bank.NBU)) {
             nbu = "✓НБУ";
-        } else if(bank.equals(Bank.PRIVAT)) {
+        } else if (bank.equals(Bank.PRIVAT)) {
             privat = "✓ПриватБанк";
-        } else if(bank.equals(Bank.MONO)) {
+        } else if (bank.equals(Bank.MONO)) {
             mono = "✓МоноБанк";
         }
 
-        SendMessage message = new SendMessage();
-        message.setText(startText);
-        message.setChatId(update.getCallbackQuery().getFrom().getId());
+        // TODO: 30.10.2023 дублюється код
+        SendMessage message = createSendMessage(startText, update);
 
         InlineKeyboardButton.InlineKeyboardButtonBuilder nbuButton = InlineKeyboardButton
                 .builder()
@@ -205,9 +220,7 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
     private void roundingButton(Update update) {
         String startText = "Виберіть кількість знаків після коми";
 
-        SendMessage message = new SendMessage();
-        message.setText(startText);
-        message.setChatId(update.getCallbackQuery().getFrom().getId());
+        SendMessage message = createSendMessage(startText, update);
 
         InlineKeyboardButton.InlineKeyboardButtonBuilder twoButton = InlineKeyboardButton
                 .builder()
@@ -228,7 +241,7 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
         InlineKeyboardMarkup keyboard1 = InlineKeyboardMarkup
                 .builder()
                 .keyboard(Collections.singletonList(
-                        Arrays.asList(twoButton.build(), threeButton.build(),fourButton.build())
+                        Arrays.asList(twoButton.build(), threeButton.build(), fourButton.build())
                 ))
                 .build();
 
@@ -243,16 +256,14 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
 
         String usd = "USD";
         String eur = "EUR";
-        if(currencies.contains(Currency.USD)) {
+        if (currencies.contains(Currency.USD)) {
             usd = "✓USD";
         }
-        if(currencies.contains(Currency.EUR)) {
+        if (currencies.contains(Currency.EUR)) {
             eur = "✓EUR";
         }
 
-        SendMessage message = new SendMessage();
-        message.setText(startText);
-        message.setChatId(update.getCallbackQuery().getFrom().getId());
+        SendMessage message = createSendMessage(startText, update);
 
         InlineKeyboardButton.InlineKeyboardButtonBuilder usdButton = InlineKeyboardButton
                 .builder()
@@ -278,11 +289,10 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
 
 
     }
-    private void notificationButton(Update update){
+
+    private void notificationButton(Update update) {
         String startText = "Виберіть час оповіщень";
-        SendMessage message = new SendMessage();
-        message.setText(startText);
-        message.setChatId(update.getCallbackQuery().getFrom().getId());
+        SendMessage message = createSendMessage(startText, update);
 
         ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
         keyboard.setResizeKeyboard(true);
@@ -311,39 +321,22 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
             e.printStackTrace();
         }
     }
-    private void roundingRate(double rate,Update update) {
-
-
-        if (update.hasCallbackQuery()) {
-
-            if ("2char".equals(update.getCallbackQuery().getData())) {
-                twoCharRate = Math.round(rate * 100d) / 100.f;
-                roundedRate = twoCharRate;
-            } else if ("3char".equals(update.getCallbackQuery().getData())) {
-                threeCharRate = Math.round(rate * 1000d) / 1000.f;
-                roundedRate = threeCharRate;
-            } else if ("4char".equals(update.getCallbackQuery().getData())) {
-                fourCharRate = Math.round(rate * 10000d) / 10000.f;
-                roundedRate = fourCharRate;
-            }
-        }
-    }
 
     private void makeUsdAsCurrency(Update update) {
-        if(update.getCallbackQuery().getData().equals("USD")) {
+        if (update.getCallbackQuery().getData().equals("USD")) {
             currencies.add(Currency.USD);
         }
-        if(update.getCallbackQuery().getData().equals("✓USD")) {
+        if (update.getCallbackQuery().getData().equals("✓USD")) {
             currencies.remove(Currency.USD);
         }
         createCurrencyButton(update);
     }
 
     private void makeEurAsCurrency(Update update) {
-        if(update.getCallbackQuery().getData().equals("EUR")) {
+        if (update.getCallbackQuery().getData().equals("EUR")) {
             currencies.add(Currency.EUR);
         }
-        if(update.getCallbackQuery().getData().equals("✓EUR")) {
+        if (update.getCallbackQuery().getData().equals("✓EUR")) {
             currencies.remove(Currency.EUR);
         }
         createCurrencyButton(update);
@@ -365,9 +358,8 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
     }
 
 
-
     @Override
-    public String  getBotToken() {
+    public String getBotToken() {
         return BotConstants.BOT_TOKEN;
     }
 

@@ -29,6 +29,7 @@ public class StartCommand extends BotCommand {
         message.setChatId(Long.toString(chat.getId()));
 
 
+        // TODO: 30.10.2023 можна винести в окремий метод, так як метод і так великий. також цей код дублюється в іншому класі
         InlineKeyboardButton.InlineKeyboardButtonBuilder infoButton = InlineKeyboardButton
                 .builder()
                 .text("Отримати інфо")
@@ -53,6 +54,7 @@ public class StartCommand extends BotCommand {
         try {
             absSender.execute(message);
         } catch (TelegramApiException e) {
+            // TODO: 30.10.2023 виберіть кращу помилку і текст до неї
             throw new RuntimeException(e);
         }
     }

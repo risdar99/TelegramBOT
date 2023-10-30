@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 
 
 import org.example.feature.currency.dto.Currency;
+import org.example.feature.currency.dto.CurrencyItemMono;
 import org.example.feature.currency.dto.CurrencyItemNBU;
 import org.jsoup.Jsoup;
 
@@ -13,11 +14,24 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 public class NBUCurrencyService implements CurrencyService{
-
+    String json;
+    List<CurrencyItemNBU> currencyItems;
+    String url ="https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json";
     @Override
     public double getRate(Currency currency) {
-        String url ="https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json";
-        String json;
+        // TODO: 30.10.2023 можна розбити на під методи
+        getJson(url);
+        int r030 = getCurrencyCode(currency);
+
+        return currencyItems.stream()
+                .filter(it -> it.getR030() == (r030))
+                .map(CurrencyItemNBU::getRate)
+                .findFirst()
+                .orElseThrow();
+    }
+
+    @Override
+    public void getJson(String str) {
         try {
             json = Jsoup
                     .connect(url)
@@ -33,21 +47,17 @@ public class NBUCurrencyService implements CurrencyService{
         Type typeToken = TypeToken
                 .getParameterized(List.class, CurrencyItemNBU.class)
                 .getType();
-        List<CurrencyItemNBU> currencyItemsNBU = new Gson().fromJson(json,typeToken);
+        currencyItems = new Gson().fromJson(json,typeToken);
+    }
 
-        int r030;
+    @Override
+    public int getCurrencyCode(Currency currency) {
         if(currency == Currency.USD) {
-            r030 = 840;
+            return 840;
         } else if(currency == Currency.EUR) {
-            r030 = 978;
+            return 978;
         } else {
-            r030 = 0;
+            return 0;
         }
-
-        return currencyItemsNBU.stream()
-                .filter(it -> it.getR030() == (r030))
-                .map(CurrencyItemNBU::getRate)
-                .findFirst()
-                .orElseThrow();
     }
 }

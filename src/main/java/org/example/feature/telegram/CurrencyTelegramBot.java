@@ -10,6 +10,9 @@ import org.example.feature.currency.CurrencyService;
 import org.example.feature.currency.NBUCurrencyService;
 import org.example.feature.currency.dto.Bank;
 import org.example.feature.currency.dto.Currency;
+
+import org.example.feature.userinterface.PrettyPrintCurrencyService;
+import org.quartz.*;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -19,12 +22,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
+import static org.quartz.CronScheduleBuilder.dailyAtHourAndMinute;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.TriggerBuilder.newTrigger;
+
+public class CurrencyTelegramBot extends TelegramLongPollingCommandBot implements Job {
     private float roundedRate;
     private float twoCharRate;
     private float threeCharRate;
@@ -37,9 +42,15 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
         currencies.add(Currency.EUR);
         bank = Bank.NBU;
         register(new StartCommand());
+
+
+
     }
+
+
     @Override
     public void processNonCommandUpdate(Update update) {
+
 
         if(update.hasCallbackQuery()){
             if (update.getCallbackQuery().getData().equals("Отримати інфо")){
@@ -283,10 +294,13 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
         message.setText(startText);
         message.setChatId(update.getCallbackQuery().getFrom().getId());
 
+
         ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
         keyboard.setResizeKeyboard(true);
         List<KeyboardRow> keyboardRows = new ArrayList<>();
         KeyboardRow row = new KeyboardRow();
+
+
 
         row.add("9");
         row.add("10");
@@ -304,12 +318,86 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
         keyboardRows.add(row);
         keyboard.setKeyboard(keyboardRows);
         message.setReplyMarkup(keyboard);
+
         try {
             execute(message);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+        //Починається обробка сповіщень
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
+
+            if (messageText.equals("9")) {
+                CronTrigger trigger = (CronTrigger) newTrigger()
+                        .withIdentity("trigger3", "group1")
+                        .withSchedule(dailyAtHourAndMinute(9, 00))
+                        .forJob("notificationForTelegramBot", "group1")
+                        .build();
+
+            } else if (messageText.equals("10")) {
+                CronTrigger trigger = (CronTrigger) newTrigger()
+                        .withIdentity("trigger3", "group1")
+                        .withSchedule(dailyAtHourAndMinute(10, 00))
+                        .forJob("notificationForTelegramBot", "group1")
+                        .build();
+
+            } else if (messageText.equals("11")){
+                CronTrigger trigger = (CronTrigger) newTrigger()
+                        .withIdentity("trigger3", "group1")
+                        .withSchedule(dailyAtHourAndMinute(11, 00))
+                        .forJob("notificationForTelegramBot", "group1")
+                        .build();
+            }else if (messageText.equals("12")){
+                CronTrigger trigger = (CronTrigger) newTrigger()
+                        .withIdentity("trigger3", "group1")
+                        .withSchedule(dailyAtHourAndMinute(12, 00))
+                        .forJob("notificationForTelegramBot", "group1")
+                        .build();
+            }else if (messageText.equals("13")){
+                CronTrigger trigger = (CronTrigger) newTrigger()
+                        .withIdentity("trigger3", "group1")
+                        .withSchedule(dailyAtHourAndMinute(13, 00))
+                        .forJob("notificationForTelegramBot", "group1")
+                        .build();
+            }else if (messageText.equals("14")){
+                CronTrigger trigger = (CronTrigger) newTrigger()
+                        .withIdentity("trigger3", "group1")
+                        .withSchedule(dailyAtHourAndMinute(14, 00))
+                        .forJob("notificationForTelegramBot", "group1")
+                        .build();
+            }else if (messageText.equals("15")){
+                CronTrigger trigger = (CronTrigger) newTrigger()
+                        .withIdentity("trigger3", "group1")
+                        .withSchedule(dailyAtHourAndMinute(15, 00))
+                        .forJob("notificationForTelegramBot", "group1")
+                        .build();
+            }else if (messageText.equals("16")){
+                CronTrigger trigger = (CronTrigger) newTrigger()
+                        .withIdentity("trigger3", "group1")
+                        .withSchedule(dailyAtHourAndMinute(16, 00))
+                        .forJob("notificationForTelegramBot", "group1")
+                        .build();
+            }else if (messageText.equals("17")){
+                CronTrigger trigger = (CronTrigger) newTrigger()
+                        .withIdentity("trigger3", "group1")
+                        .withSchedule(dailyAtHourAndMinute(17, 00))
+                        .forJob("notificationForTelegramBot", "group1")
+                        .build();
+            }else if (messageText.equals("18")){
+                CronTrigger trigger = (CronTrigger) newTrigger()
+                        .withIdentity("trigger3", "group1")
+                        .withSchedule(dailyAtHourAndMinute(18, 00))
+                        .forJob("notificationForTelegramBot", "group1")
+                        .build();
+            }
+        }
+
+
     }
+
+
     private void roundingRate(double rate,Update update) {
 
 
@@ -375,4 +463,11 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot {
         return BotConstants.BOT_NAME;
     }
 
+    @Override
+    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+        JobDetail job = newJob(CurrencyTelegramBot.class)
+                .withIdentity("notificationForTelegramBot", "group1") 
+                .build();
+
+    }
 }

@@ -324,7 +324,8 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot implement
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
-        //Починається обробка сповіщень
+    }
+    private void set9AMAsNotification(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
@@ -336,67 +337,164 @@ public class CurrencyTelegramBot extends TelegramLongPollingCommandBot implement
                         .forJob("notificationForTelegramBot", "group1")
                         .build();
 
-            } else if (messageText.equals("10")) {
+
+            }
+
+        }
+    }
+    private void set10AMAsNotification(Update update) {
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
+
+            if (messageText.equals("10")) {
                 CronTrigger trigger = (CronTrigger) newTrigger()
                         .withIdentity("trigger3", "group1")
                         .withSchedule(dailyAtHourAndMinute(10, 00))
                         .forJob("notificationForTelegramBot", "group1")
                         .build();
 
-            } else if (messageText.equals("11")){
+
+            }
+
+        }
+    }
+    private void set11AMAsNotification(Update update) {
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
+
+            if (messageText.equals("11")) {
                 CronTrigger trigger = (CronTrigger) newTrigger()
                         .withIdentity("trigger3", "group1")
                         .withSchedule(dailyAtHourAndMinute(11, 00))
                         .forJob("notificationForTelegramBot", "group1")
                         .build();
-            }else if (messageText.equals("12")){
+
+
+            }
+
+        }
+    }
+    private void set12AMAsNotification(Update update) {
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
+
+            if (messageText.equals("12")) {
                 CronTrigger trigger = (CronTrigger) newTrigger()
                         .withIdentity("trigger3", "group1")
                         .withSchedule(dailyAtHourAndMinute(12, 00))
                         .forJob("notificationForTelegramBot", "group1")
                         .build();
-            }else if (messageText.equals("13")){
+
+
+            }
+
+        }
+    }
+    private void set1PMAsNotification(Update update) {
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
+
+            if (messageText.equals("13")) {
                 CronTrigger trigger = (CronTrigger) newTrigger()
                         .withIdentity("trigger3", "group1")
                         .withSchedule(dailyAtHourAndMinute(13, 00))
                         .forJob("notificationForTelegramBot", "group1")
                         .build();
-            }else if (messageText.equals("14")){
+
+
+            }
+
+        }
+    }
+    private void set2PMAsNotification(Update update) {
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
+
+            if (messageText.equals("14")) {
                 CronTrigger trigger = (CronTrigger) newTrigger()
                         .withIdentity("trigger3", "group1")
                         .withSchedule(dailyAtHourAndMinute(14, 00))
                         .forJob("notificationForTelegramBot", "group1")
                         .build();
-            }else if (messageText.equals("15")){
+
+
+            }
+
+        }
+    }
+    private void set3PMAsNotification(Update update){
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
+
+            if (messageText.equals("15")) {
                 CronTrigger trigger = (CronTrigger) newTrigger()
                         .withIdentity("trigger3", "group1")
                         .withSchedule(dailyAtHourAndMinute(15, 00))
                         .forJob("notificationForTelegramBot", "group1")
                         .build();
-            }else if (messageText.equals("16")){
+
+
+            }
+
+        }
+    }
+    private void set4PMAsNotification(Update update) {
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
+
+            if (messageText.equals("16")) {
                 CronTrigger trigger = (CronTrigger) newTrigger()
                         .withIdentity("trigger3", "group1")
                         .withSchedule(dailyAtHourAndMinute(16, 00))
                         .forJob("notificationForTelegramBot", "group1")
                         .build();
-            }else if (messageText.equals("17")){
+
+
+            }
+
+        }
+    }
+    private void set5PMAsNotification(Update update) {
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
+
+            if (messageText.equals("17")) {
                 CronTrigger trigger = (CronTrigger) newTrigger()
                         .withIdentity("trigger3", "group1")
                         .withSchedule(dailyAtHourAndMinute(17, 00))
                         .forJob("notificationForTelegramBot", "group1")
                         .build();
-            }else if (messageText.equals("18")){
+
+
+            }
+
+        }
+    }
+    private void set6PMAsNotification(Update update) {
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = update.getMessage().getText();
+            long chatId = update.getMessage().getChatId();
+
+            if (messageText.equals("18")) {
                 CronTrigger trigger = (CronTrigger) newTrigger()
                         .withIdentity("trigger3", "group1")
                         .withSchedule(dailyAtHourAndMinute(18, 00))
                         .forJob("notificationForTelegramBot", "group1")
                         .build();
+
+
             }
+
         }
-
-
     }
-
 
     private void roundingRate(double rate,Update update) {
 
